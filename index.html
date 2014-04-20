@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>WeBuild Live Stream Checker</title>
+	<script type="text/javascript">
+		window.addEventListener('load', function(){
+			console.log("Loaded!")
+			var liveText = document.getElementById('livetext');
+			var liveAudio = document.getElementById('liveaudio');
+			var radioText = document.getElementById('radiotext');
+			var radioAudio = document.getElementById('radioaudio');
+
+			liveAudio.src = "http://listen.webuild.sg:8000/live";
+			radioaudio.src = "http://listen.webuild.sg:8000/radio";
+
+			updateStreams();
+
+			window.setInterval(function(){
+				updateStreams();
+			},3000);
+
+
+
+			function updateStreams(){
+				if (liveAudio.error != null ||
+					liveAudio.networkState == HTMLMediaElement.NETWORK_NO_SOURCE ||
+					liveAudio.networkState == HTMLMediaElement.NETWORK_EMPTY){
+					liveText.innerHTML = "Live Stream is Not Reachable";
+
+				}else{
+					liveText.innerHTML = "Live Stream is Live";
+				}
+				if (radioAudio.error != null ||
+					radioAudio.networkState == HTMLMediaElement.NETWORK_NO_SOURCE ||
+					radioAudio.networkState == HTMLMediaElement.NETWORK_EMPTY){
+					radioText.innerHTML = "Radio Stream is Not Reachable";
+
+				}else{
+					radioText.innerHTML = "Radio Stream is Live";
+				}
+			}
+		});
+	</script>
+</head>
+<body>
+	<br>
+	<div >
+		<div id="livetext"> </div>
+		<audio id="liveaudio" autobuffer controls></audio>
+	</div>
+	<br>
+	<div id="radio">
+		<div id="radiotext" > </div>
+		<audio id="radioaudio" autobuffer controls></audio>
+	</div>
+</body>
+</html>
