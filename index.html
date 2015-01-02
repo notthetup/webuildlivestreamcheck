@@ -5,9 +5,20 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>WeBuild Live Stream Checker</title>
+	<script src="/wavy-jones.js"></script>
+	<style>
+    .scope {
+    		border: 1px solid;
+        width: 600px;
+        height: 200px;
+    }
+	</style>
 	<script type="text/javascript">
 		window.addEventListener('load', function(){
 			console.log("Loaded!")
+			window.AudioContext = window.AudioContext || window.webkitAudioContext
+			var context = new AudioContext();
+
 			var liveText = document.getElementById('livetext');
 			var liveAudio = document.getElementById('liveaudio');
 			var radioText = document.getElementById('radiotext');
@@ -16,11 +27,29 @@
 			liveAudio.src = "http://listen.webuild.sg:8000/live";
 			radioaudio.src = "http://listen.webuild.sg:8000/radio";
 
+			scopeAudio(liveAudio, 'oscilloscope-live');
+			scopeAudio(radioAudio, 'oscilloscope-radio');
+
 			updateStreams();
+
+			liveAudio.play();
+			radioAudio.play();
 
 			window.setInterval(function(){
 				updateStreams();
 			},3000);
+
+			function scopeAudio(audioEl, scopeID){
+				var myGain = context.createGain();
+				myGain.gain.value = 0.01;
+				var myOscilloscope = new WavyJones(context, scopeID);
+				myOscilloscope.lineColor = '#111111';
+				myOscilloscope.lineThickness = 2;
+				var audioMediaElement = context.createMediaElementSource(audioEl);
+				audioMediaElement.connect(myOscilloscope);
+				myOscilloscope.connect(myGain)
+				myGain.connect(context.destination);
+			}
 
 			function updateStreams(){
 				if (liveAudio.error != null ||
@@ -46,11 +75,13 @@
 <body>
 	<br>
 	<div >
+		<div class="scope" id="oscilloscope-live"></div>
 		<div id="livetext"> </div>
 		<audio id="liveaudio" autobuffer controls></audio>
 	</div>
 	<br>
 	<div id="radio">
+		<div class="scope" id="oscilloscope-radio"></div>
 		<div id="radiotext" > </div>
 		<audio id="radioaudio" autobuffer controls></audio>
 	</div>
